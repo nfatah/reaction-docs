@@ -123,6 +123,12 @@
         "docPath": "developer/styleguide.md"
     }, {
         "class": "guide-sub-nav-item",
+        "alias": "code-style",
+        "label": "Code Style",
+        "repo": "reaction-docs",
+        "docPath": "developer/code-style.md"
+    }, {
+        "class": "guide-sub-nav-item",
         "alias": "contributing-to-reaction",
         "label": "Contributing",
         "repo": "reaction-docs",
