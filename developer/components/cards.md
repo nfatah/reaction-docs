@@ -1,4 +1,4 @@
-# Cards (React)
+# Cards
 
 ## Import
 
@@ -57,39 +57,88 @@ title        | String | Title for card header
 
 No Props, use as wrapper for card content
 
-## Cards (Blaze)
+# Settings Cards
 
-```html
-{{#card}}
-  Content at the body of the card
-{{/card}}
-```
+When you need a
 
-Property              | Type  | Description
---------------------- | ----- | ------------------------------------------------------
-[controls](#controls) | Array | Array of button Props. [see button component](#button)
+## Props
 
-### Examples
+Property       | Type     | Description
+-------------- | -------- | ----------------------------------------------------------------------------------------
+i18nKeyTitle   | String   | Key for i18n translation
+title          | String   | Title for card header
+template       | Blaze    | A blaze template
+expanded       | Boolean  | true / false if the card is expanded
+onExpand       | Function | Called when card is expanded / collapsed. <br> `(event, card, name, isExpanded) => {}`
+enabled        | Boolean  | true / false will set the switch to on / off
+onSwitchChange | Function | Callback on switch change (on / off). <br> `(event, isChecked, name) => {}`
+name           | String   | Used to identify components in callbacks.
+icon           | String   | Font name from Font-awesome
+children       | Node     | React child nodes. Set as the prop, or in the body of the tag.
 
-#### controls
+## Usage Example
+
+### Usage within a react component
 
 ```javascript
-Template.myTemplate.helpers({
-  cardProps() {
-    return {
-      controls: [{
-        icon: "fa fa-plus-square fa-fw",
-        onClick() {
-          console.log("Clicked!");
-        }
-      }]
-    }
+import React, { Component } from "react";
+import { Reaction } "client/api";
+import { CardGroup,  SettingsCard } from "/imports/plugins/core/ui/client/components";
+
+class MyReactComponent extends Component {
+  render() {
+    return (
+      <SettingsCard
+        i18nKeyTitle={this.props.i18nKey}
+        onExpand={this.props.onSettingExpand}
+        expanded={this.props.expanded}
+        title={this.props.title}
+        name={this.props.name}
+        enabled={this.props.enabled}
+        icon={this.props.icon}
+        onSwitchChange={this.props.onSettingEnableChange}
+      >
+        {/* Body of component (children) */}
+      </SettingsCard>
+    )
   }
-});
+}
+
+export default MyReactComponent;
 ```
 
-```html
-{{#card cardControls}}
-  Content at the body of the card
-{{/card}}
+### Usage within a blaze component
+
+**NOTE** Prefer building the settings component with React-only instead of using this method. This is provided to aide in unifying the experience while we work towards a 100% react conversion.
+
+```javascript
+import { Reaction } from "/client/api";
+
+Template.myTemplate.helpers({
+  SettingsComponent() {
+    const currentData = Template.currentData();
+    const preferences = Reaction.getUserPreferences("reaction-social", "settingsCards", {});
+
+    return {
+      component: SettingsCard,
+      template: "nameOfBlazeTemplateToInclude"
+      i18nKeyTitle: "i18nKey.path"
+      title="Setting Card Title"
+      icon="fa fa-plus" // Optional
+
+      // Callbacks
+      name="nameUsedForCallbacks"
+      onExpand(event, card, name, isExpanded) {
+        Reaction.updateUserPreferences("<PACKAGE_NAME>", "settingCards", {
+          [name]: isExpanded
+        });
+      }
+      expanded={preferences[settingName]}
+      enabled={currentData.enabled}
+      onSwitchChange(isChecked, name) {
+        // Update package enabled / disabled status here
+      }
+    }
+  }
+})
 ```
